@@ -1,0 +1,44 @@
+name: axion-ui
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  ACR_REGISTRY: acrmyapplication.azurecr.io
+  IMAGE_NAME: axion-ui
+
+permissions:
+  id-token: write  # GitHub OIDC Token জেনারেট করার জন্য
+  contents: read   # Repo ফাইল রিড করার জন্য
+  pull-requests: write
+
+jobs:
+  build-and-push:
+    name: Build & Push to ACR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login via OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name acrmyapplication
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
+        
+
+      - name: Push Docker Image to ACR
+        run: |
+          docker push ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME }}:latest

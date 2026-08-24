@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axiom_ui
+spec:
+  selector:
+    matchLabels:
+      app: axiom_ui
+  template:
+    metadata:
+      labels:
+        app: axiom_ui
+    spec:
+      containers:
+      - name: axiom_ui
+        image: <Image>
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: <Port>
